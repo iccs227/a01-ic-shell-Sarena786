@@ -24,7 +24,19 @@ void execute(char **args) {
         printf("Error forking process\n");
         return; 
     } else if (pid == 0) {
-        if()
+        if(execvp(args[0], args) < 0) {
+            printf("Error executing command\n");
+        }
+        exit(0);
+    } else {
+        wait(NULL); 
     }
+}
 
+int getInput(char* str) {
+    char* buf;
+    size_t len = 0;
+
+    if(getline(&str, &len, stdin) != -1) {
+    }
 }
