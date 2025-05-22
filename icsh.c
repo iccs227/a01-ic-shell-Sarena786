@@ -13,19 +13,25 @@
 
 int main() {
     char buffer[MAX_CMD_BUFFER];
-    printf("Starting IC Shell\n");
+    shell();
     while (1) {
-        printf("icsh $ ");
-        fgets(buffer, 255, stdin);
-        printf("%s\n", buffer);
+        if(getInput(buffer) == -1) {
+            continue;
+        }
+        
     }
 }
 
-int getInput(char **str) {
-    size_t len = 0;
+int shell(){
+    clear();
+    printf("Starting IC Shell\n");
+    printf("icsh $ ");
+}
 
-    if(fgets(str, &len, stdin) != -1) {
-        return str;
+int getInput(char *str) {
+
+    if(fgets(str, MAX_CMD_BUFFER, stdin) != -1) {
+        return 0;
     } else {
         return -1;
     }
