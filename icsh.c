@@ -28,9 +28,13 @@ int main() {
             continue;
         }
 
-        if(strcmp(args[0], "exit") == 0 || strcmp(args[0], "quit") == 0) {
-            break;
-            execute(args);
+        if(strcmp(args[0], "exit") == 0) {
+            int code = 0;
+            if(args[1] != NULL) {
+                code = atoi(args[1]) & 0xFF;
+            }
+            printf("Bye\n");
+            exit(code);
         }
     }
     return 0;
@@ -69,4 +73,8 @@ void ParseInput(char *buffer, char **args) {
         i++;
     }
     args[i] = NULL;
+}
+
+int cmdHandler(char **parsed) {
+
 }
