@@ -23,14 +23,13 @@ int main() {
 }
 
 int shell(){
-    clear();
     printf("Starting IC Shell\n");
     printf("icsh $ ");
 }
 
-int getInput(char *str) {
-
-    if(fgets(str, MAX_CMD_BUFFER, stdin) != -1) {
+int getInput(char *buffer) {
+    if(fgets(buffer, MAX_CMD_BUFFER, stdin) != -1) {
+        buffer[strcspn(buffer, "\n")] = 0;
         return 0;
     } else {
         return -1;
