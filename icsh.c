@@ -17,11 +17,13 @@ void ParseInput(char *buffer, char **args);
 int cmdHandler(char **parsed);
 
 int main() {
+
     char buffer[MAX_CMD_BUFFER];
     char lastCommand[MAX_CMD_BUFFER] = {0};
     char *args[32];
 
     printf("Starting IC Shell\n");
+
     while (1) {
         printf("icsh $ ");
         if(getInput(buffer) == -1) {
@@ -41,8 +43,8 @@ int main() {
             continue;
         }
         cmdHandler(args);
-
     }
+
     return 0;
 }
 
@@ -66,6 +68,7 @@ void ParseInput(char *buffer, char **args) {
 }
 
 int cmdHandler(char **args) {
+
     if(args[0] == NULL) {
         return 0;
     }
@@ -79,6 +82,7 @@ int cmdHandler(char **args) {
         }
         printf("\n");
     }
+
     else if (strcmp(args[0], "exit") == 0) {
         int code = 0;
         if(args[1] != NULL) {
@@ -86,8 +90,11 @@ int cmdHandler(char **args) {
         }
         printf("Bye\n");
         exit(code);
-    } else {
+    } 
+    
+    else {
         printf("%s", "bad command\n");
     }
+    
     return 0;
 }
