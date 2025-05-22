@@ -5,16 +5,29 @@
 
 #include "stdio.h"
 #include <sys/types.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #define MAX_CMD_BUFFER 255
 
 int main() {
     char buffer[MAX_CMD_BUFFER];
+    printf("Starting IC Shell\n");
     while (1) {
-        printf("Starting IC Shell\n");
         printf("icsh $ ");
         fgets(buffer, 255, stdin);
         printf("%s\n", buffer);
+    }
+}
+
+int getInput(char **str) {
+    size_t len = 0;
+
+    if(fgets(str, &len, stdin) != -1) {
+        return str;
+    } else {
+        return -1;
     }
 }
 
@@ -30,13 +43,5 @@ void execute(char **args) {
         exit(0);
     } else {
         wait(NULL); 
-    }
-}
-
-int getInput(char* str) {
-    char* buf;
-    size_t len = 0;
-
-    if(getline(&str, &len, stdin) != -1) {
     }
 }
