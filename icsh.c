@@ -8,8 +8,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #define MAX_CMD_BUFFER 255
+int getInput(char *buffer);
+void ParseInput(char *buffer, char **args);
+int cmdHandler(char **parsed);
 
 int main() {
     char buffer[MAX_CMD_BUFFER];
@@ -22,8 +26,8 @@ int main() {
             clearerr(stdin);
             continue;
         }
+
         ParseInput(buffer, args);
-        
         if(args[0] == NULL) {
             continue;
         }
@@ -36,32 +40,17 @@ int main() {
             printf("Bye\n");
             exit(code);
         }
+        execute(args);
     }
     return 0;
 }
 
 int getInput(char *buffer) {
-    if(fgets(buffer, MAX_CMD_BUFFER, stdin) != -1) {
+    if(fgets(buffer, MAX_CMD_BUFFER, stdin) != NULL) {
         buffer[strcspn(buffer, "\n")] = 0;
         return 0;
-    } else {
-        return -1;
     }
-}
-
-void execute(char **args) {
-    pid_t pid = fork();
-    if(pid == -1) {
-        printf("Error forking process\n");
-        return; 
-    } else if (pid == 0) {
-        if(execvp(args[0], args) < 0) {
-            printf("Error executing command\n");
-        }
-        exit(0);
-    } else {
-        wait(NULL); 
-    }
+    return -1;
 }
 
 void ParseInput(char *buffer, char **args) {
@@ -75,6 +64,39 @@ void ParseInput(char *buffer, char **args) {
     args[i] = NULL;
 }
 
-int cmdHandler(char **parsed) {
+int cmdHandler(char **args, char *secondArg) {
+    char *string = malloc(MAX_CMD_BUFFER);
 
+    if(args[0] == NULL) {
+        return 0;
+    }
+
+    string[0] = '\0';
+
+    if(strcmp(args[0], "echo") == 0) {
+        for(int i = 1; args[i] != NULL; i++) {
+            strcat(string, args[i]);
+            printf("%s ", args[i]);
+            if(args[i + 1]) {
+                printf("%s", " ");
+                strcat(string, " ");
+            }
+        }
+        printf("\n");
+    }
+
+    else if (strcmp(args[0], "!!") == 0) {
+        
+    }
+
+    else if (strcmp(args[0], "exit") == 0) {
+        int code = 0;
+        if(args[1] != NULL) {
+            code = atoi(args[1]) & 0xFF;
+        }
+        printf("Bye\n");
+        exit(code);
+    }
+
+    return 0;
 }
