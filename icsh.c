@@ -5,7 +5,6 @@
 
 #include "stdio.h"
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,6 +13,8 @@
 
 int main() {
     char buffer[MAX_CMD_BUFFER];
+    char *args[32];
+
     printf("Starting IC Shell\n");
     while (1) {
         printf("icsh $ ");
@@ -21,7 +22,16 @@ int main() {
             clearerr(stdin);
             continue;
         }
+        ParseInput(buffer, args);
         
+        if(args[0] == NULL) {
+            continue;
+        }
+
+        if(strcmp(args[0], "exit") == 0 || strcmp(args[0], "quit") == 0) {
+            break;
+            execute(args);
+        }
     }
     return 0;
 }
