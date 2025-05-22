@@ -11,12 +11,14 @@
 #include <sys/wait.h>
 
 #define MAX_CMD_BUFFER 255
+
 int getInput(char *buffer);
 void ParseInput(char *buffer, char **args);
 int cmdHandler(char **parsed);
 
 int main() {
     char buffer[MAX_CMD_BUFFER];
+    char lastCommand[MAX_CMD_BUFFER] = {0};
     char *args[32];
 
     printf("Starting IC Shell\n");
@@ -27,20 +29,19 @@ int main() {
             continue;
         }
 
+        if(strcmp(buffer, "!!") == 0) {
+            printf("%s\n", lastCommand);
+            strcpy(buffer, lastCommand);
+        } else {
+            strcpy(lastCommand, buffer);
+        }
+
         ParseInput(buffer, args);
         if(args[0] == NULL) {
             continue;
         }
+        cmdHandler(args);
 
-        if(strcmp(args[0], "exit") == 0) {
-            int code = 0;
-            if(args[1] != NULL) {
-                code = atoi(args[1]) & 0xFF;
-            }
-            printf("Bye\n");
-            exit(code);
-        }
-        execute(args);
     }
     return 0;
 }
@@ -64,31 +65,20 @@ void ParseInput(char *buffer, char **args) {
     args[i] = NULL;
 }
 
-int cmdHandler(char **args, char *secondArg) {
-    char *string = malloc(MAX_CMD_BUFFER);
-
+int cmdHandler(char **args) {
     if(args[0] == NULL) {
         return 0;
     }
 
-    string[0] = '\0';
-
     if(strcmp(args[0], "echo") == 0) {
         for(int i = 1; args[i] != NULL; i++) {
-            strcat(string, args[i]);
             printf("%s ", args[i]);
-            if(args[i + 1]) {
-                printf("%s", " ");
-                strcat(string, " ");
-            }
+            if(args[i + 1]== NULL) {
+                printf(" ");
+            }   
         }
         printf("\n");
     }
-
-    else if (strcmp(args[0], "!!") == 0) {
-        
-    }
-
     else if (strcmp(args[0], "exit") == 0) {
         int code = 0;
         if(args[1] != NULL) {
@@ -96,7 +86,8 @@ int cmdHandler(char **args, char *secondArg) {
         }
         printf("Bye\n");
         exit(code);
+    } else {
+        printf("%s", "bad command\n");
     }
-
     return 0;
 }
