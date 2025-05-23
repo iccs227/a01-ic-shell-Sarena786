@@ -33,16 +33,18 @@ int main(int argc, char *argv[]) {
 
     printf("Starting IC Shell\n");
 
-    while (1) { 
-        printf("icsh $ ");
+    while (1) {
+        if(fp == NULL) {
+            printf("icsh $ ");
+        }
 
         if(getInput(buffer, fp) == -1) {
             if(fp != NULL) {
                 fclose(fp);
-                continue;
+                break;
             } else {
-            clearerr(stdin);
-            continue;
+                clearerr(stdin);
+                continue;
             }
         }
 
@@ -95,7 +97,7 @@ int cmdHandler(char **args) {
     if(strcmp(args[0], "echo") == 0) {
         for(int i = 1; args[i] != NULL; i++) {
             printf("%s ", args[i]);
-            if(args[i + 1]== NULL) {
+            if(args[i + 1] == NULL) {
                 printf(" ");
             }   
         }
