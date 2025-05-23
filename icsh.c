@@ -12,23 +12,38 @@
 
 #define MAX_CMD_BUFFER 255
 
-int getInput(char *buffer);
+int getInput(char *buffer, FILE *fp);
 void ParseInput(char *buffer, char **args);
 int cmdHandler(char **parsed);
 
-int main() {
+int main(int argc, char *argv[]) {
 
     char buffer[MAX_CMD_BUFFER];
     char lastCommand[MAX_CMD_BUFFER] = {0};
     char *args[32];
+    FILE *fp = NULL;
+
+    if(argc > 1) {
+        fp = fopen(argv[1], "r");
+        if(fp == NULL) {
+            printf("Cannot Open the file");
+            return -1;
+        }
+    }
 
     printf("Starting IC Shell\n");
 
-    while (1) {
+    while (1) { 
         printf("icsh $ ");
-        if(getInput(buffer) == -1) {
+
+        if(getInput(buffer, fp) == -1) {
+            if(fp != NULL) {
+                fclose(fp);
+                continue;
+            } else {
             clearerr(stdin);
             continue;
+            }
         }
 
         if(strcmp(buffer, "!!") == 0) {
@@ -48,8 +63,12 @@ int main() {
     return 0;
 }
 
-int getInput(char *buffer) {
-    if(fgets(buffer, MAX_CMD_BUFFER, stdin) != NULL) {
+int getInput(char *buffer, FILE *fp) {
+    if(fp != NULL) {
+        fgets(buffer, MAX_CMD_BUFFER, fp);
+        buffer[strcspn(buffer, "\n")] = 0;
+        return 0;
+    } else if (fgets(buffer, MAX_CMD_BUFFER, stdin) != NULL) {
         buffer[strcspn(buffer, "\n")] = 0;
         return 0;
     }
@@ -96,18 +115,5 @@ int cmdHandler(char **args) {
         printf("%s", "bad command\n");
     }
     
-    return 0;
-}
-
-void ReadFromScript(FILE *fp) {
-    if(fp == NULL) {
-        fprintf(stderr, "Error opening script file\n");
-        return;
-    } else {
-    FILE *scriptFile = fopen(fp, "r");
-    fgets(buffer, MAX_CMD_BUFFER, scriptFile);
-    buffer[strcspn(buffer, "\n")] = 0;
-    fclose(scriptFile);
-    }
     return 0;
 }
