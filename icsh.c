@@ -98,3 +98,16 @@ int cmdHandler(char **args) {
     
     return 0;
 }
+
+void ReadFromScript(FILE *fp) {
+    if(fp == NULL) {
+        fprintf(stderr, "Error opening script file\n");
+        return;
+    } else {
+    FILE *scriptFile = fopen(fp, "r");
+    fgets(buffer, MAX_CMD_BUFFER, scriptFile);
+    buffer[strcspn(buffer, "\n")] = 0;
+    fclose(scriptFile);
+    }
+    return 0;
+}
