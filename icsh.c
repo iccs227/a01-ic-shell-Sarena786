@@ -137,6 +137,7 @@ void RunExternalCmd(char *buffer) {
     int *args[16];
 
     getInput(buffer, NULL);
+    ParseInput(buffer, args);
 
     if ((pid=fork()) < 0)
     {
