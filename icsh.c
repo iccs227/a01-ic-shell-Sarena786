@@ -48,6 +48,10 @@ int main(int argc, char *argv[]) {
             }
         }
 
+        if(buffer[0] == '\0' || buffer[0] == '#') {
+            continue;
+        }
+
         if(strcmp(buffer, "!!") == 0) {
             printf("%s\n", lastCommand);
             strcpy(buffer, lastCommand);
