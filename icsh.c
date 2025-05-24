@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 void Run(FILE *fp) {
     char buffer[MAX_CMD_BUFFER];
     char lastCommand[MAX_CMD_BUFFER] = {0};
-    char *args[32];
+    char *args[64];
 
     while (1) {
         if(fp == NULL) {
@@ -134,10 +134,7 @@ int cmdHandler(char **args) {
 void RunExternalCmd(char *buffer) {
     int status;
     int pid;
-    int *args[16];
-
-    getInput(buffer, NULL);
-    ParseInput(buffer, args);
+    char *args[64];
 
     if ((pid=fork()) < 0)
     {
