@@ -16,6 +16,7 @@ int getInput(char *buffer, FILE *fp);
 void ParseInput(char *buffer, char **args);
 int cmdHandler(char **parsed);
 void Run(FILE *fp);
+void RunExternalCmd(char *buffer);
 
 int main(int argc, char *argv[]) {
     FILE *fp = NULL;
@@ -72,6 +73,11 @@ void Run(FILE *fp) {
         if(args[0] == NULL) {
             continue;
         }
+
+        if(!cmdHandler(args)) {
+            RunExternalCmd(args);
+        }
+        
         cmdHandler(args);
     }
 }
@@ -131,10 +137,8 @@ int cmdHandler(char **args) {
     return 0;
 }
 
-void RunExternalCmd(char *buffer) {
-    int status;
+void RunExternalCmd(char **args) {
     int pid;
-    char *args[64];
 
     if ((pid=fork()) < 0)
     {
