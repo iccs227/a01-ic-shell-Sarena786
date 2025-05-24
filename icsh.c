@@ -14,9 +14,9 @@
 
 int getInput(char *buffer, FILE *fp);
 void ParseInput(char *buffer, char **args);
-int cmdHandler(char **parsed);
+int cmdHandler(char **args);
 void Run(FILE *fp);
-void RunExternalCmd(char *buffer);
+void RunExternalCmd(char **args);
 
 int main(int argc, char *argv[]) {
     FILE *fp = NULL;
