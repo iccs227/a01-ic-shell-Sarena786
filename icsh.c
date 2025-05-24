@@ -130,3 +130,28 @@ int cmdHandler(char **args) {
     
     return 0;
 }
+
+void RunExternalCmd() {
+    int status;
+    int pid;
+    char *prog_arv[4];
+
+    prog_argv[0] = "/usr/local/bin/ls";
+    prog_argv[1] = "-l";
+    prog_argv[2] = "/";
+    prog_argv[3] = NULL;
+
+    if ((pid=fork()) < 0)
+    {
+        perror ("Fork failed");
+        exit(errno);
+    }
+
+    if(!pid) {
+        execvp (prog_argv[0], prog_argv);
+    }
+
+    if(pid) {
+        waitpid(pid, NULL, 0).;
+    }
+} 
