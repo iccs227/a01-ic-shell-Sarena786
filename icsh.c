@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <errno.h>
 
 #define MAX_CMD_BUFFER 255
 
@@ -77,8 +78,6 @@ void Run(FILE *fp) {
         if(!cmdHandler(args)) {
             RunExternalCmd(args);
         }
-        
-        cmdHandler(args);
     }
 }
 
@@ -119,6 +118,8 @@ int cmdHandler(char **args) {
             }   
         }
         printf("\n");
+        return 1;
+
     }
 
     else if (strcmp(args[0], "exit") == 0) {
@@ -129,10 +130,6 @@ int cmdHandler(char **args) {
         printf("Bye\n");
         exit(code);
     } 
-    
-    else {
-        printf("%s", "bad command\n");
-    }
     
     return 0;
 }
@@ -148,6 +145,8 @@ void RunExternalCmd(char **args) {
 
     if(!pid) {
         execvp (args[0], args);
+        printf("bad command\n");
+        exit(1);
     }
 
     if(pid) {
