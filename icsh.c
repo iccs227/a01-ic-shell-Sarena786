@@ -131,15 +131,12 @@ int cmdHandler(char **args) {
     return 0;
 }
 
-void RunExternalCmd() {
+void RunExternalCmd(char *buffer) {
     int status;
     int pid;
-    char *prog_arv[4];
+    int *args[16];
 
-    prog_argv[0] = "/usr/local/bin/ls";
-    prog_argv[1] = "-l";
-    prog_argv[2] = "/";
-    prog_argv[3] = NULL;
+    getInput(buffer, NULL);
 
     if ((pid=fork()) < 0)
     {
@@ -148,10 +145,10 @@ void RunExternalCmd() {
     }
 
     if(!pid) {
-        execvp (prog_argv[0], prog_argv);
+        execvp (args[0], args);
     }
 
     if(pid) {
-        waitpid(pid, NULL, 0).;
+        waitpid(pid, NULL, 0);
     }
 } 
