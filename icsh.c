@@ -144,7 +144,7 @@ void RunExternalCmd(char **args) {
     }
 
     if(!pid) {
-        execvp (args[0], args);
+        execvp (args[0], args); // only return when there is an error
         printf("bad command\n");
         exit(1);
     }
@@ -153,3 +153,11 @@ void RunExternalCmd(char **args) {
         waitpid(pid, NULL, 0);
     }
 } 
+
+void ChildHandler(int sig, siginfo_t *sip, void *notused) {
+    int status;
+    printf ("The process generating the signal is PID: %d\n", sip->si_pid);
+    fflush (stdout);
+
+    
+}
