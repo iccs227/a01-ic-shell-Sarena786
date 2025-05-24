@@ -15,12 +15,9 @@
 int getInput(char *buffer, FILE *fp);
 void ParseInput(char *buffer, char **args);
 int cmdHandler(char **parsed);
+void Run(FILE *fp);
 
 int main(int argc, char *argv[]) {
-
-    char buffer[MAX_CMD_BUFFER];
-    char lastCommand[MAX_CMD_BUFFER] = {0};
-    char *args[32];
     FILE *fp = NULL;
 
     if(argc > 1) {
@@ -33,6 +30,20 @@ int main(int argc, char *argv[]) {
 
     printf("Starting IC Shell\n");
 
+    Run(fp);
+    
+    if(fp != NULL) {
+        fclose(fp);
+    }
+
+    return 0;
+}
+
+void Run(FILE *fp) {
+    char buffer[MAX_CMD_BUFFER];
+    char lastCommand[MAX_CMD_BUFFER] = {0};
+    char *args[32];
+
     while (1) {
         if(fp == NULL) {
             printf("icsh $ ");
@@ -40,12 +51,10 @@ int main(int argc, char *argv[]) {
 
         if(getInput(buffer, fp) == -1) {
             if(fp != NULL) {
-                fclose(fp);
                 break;
-            } else {
-                clearerr(stdin);
-                continue;
             }
+            clearerr(stdin);
+            continue;
         }
 
         if(buffer[0] == '\0' || buffer[0] == '#') {
@@ -65,8 +74,6 @@ int main(int argc, char *argv[]) {
         }
         cmdHandler(args);
     }
-
-    return 0;
 }
 
 int getInput(char *buffer, FILE *fp) {
