@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <signal.h>
 
 #define MAX_CMD_BUFFER 255
 
@@ -159,5 +160,25 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
     printf ("The process generating the signal is PID: %d\n", sip->si_pid);
     fflush (stdout);
 
-    
+    status = 0;
+
+    if(sip->si_pid == waitpid(sip->si_pid, $status, WNOHANG)) {
+        if (WIFEXITED(status)|| WTERMSIG(status))
+
+         printf ("The child is gone\n");
+
+       else
+
+         printf ("Uninteresting\n");
+    } else {
+            printf ("Uninteresting\n");
+        }
+}
+
+void signalHandler(signal *sig) {
+    struct sigaction action;
+    action.sa_sigaction = ChildHandler
+    sigfillset($action.sa_mask);
+    sa
+
 }
