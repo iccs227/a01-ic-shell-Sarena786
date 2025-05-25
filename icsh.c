@@ -166,13 +166,10 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
 
     status = 0; 
 
-    if(waitpid(pid_track, &status, WNOHANG) > 0) {
+    if(waitpid (sip->si_pid, &status, WNOHANG) > 0) {
         if (WIFEXITED(status)|| WTERMSIG(status))
-
          printf ("The child is gone\n");
-
-       else
-
+        else
          printf ("Uninteresting\n");
     } else {
             printf ("Uninteresting\n");
@@ -211,7 +208,11 @@ void signalHandler() {
     sa_int.sa_flags = 0;
     sigaction(SIGINT, &sa_int, NULL);
 
-    
+    struct sigaction sa_tstp;
+    sa_tstp.sa_handler = SIGTSTPHandler;
+    sigemptyset(&sa_tstp.sa_mask);
+    sa_tstp.sa_flags = 0;
+    sigaction(SIGTSTP, &sa_tstp, NULL);
 
     while(1) {
         printf("PID:%d\n", getpid());
