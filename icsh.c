@@ -164,9 +164,9 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
     printf ("The process generating the signal is PID: %d\n", sip->si_pid);
     fflush (stdout);
 
-    status = 0;
+    status = 0; 
 
-    if(sip->si_pid == waitpid(sip->si_pid, $status, WNOHANG)) {
+    if(sip->si_pid == waitpid(sip->si_pid, &status, WNOHANG)) {
         if (WIFEXITED(status)|| WTERMSIG(status))
 
          printf ("The child is gone\n");
@@ -179,14 +179,18 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
         }
 }
 
-void signalHandler(signal *sig) {
+void Signal() {
+    if(pid_track > 0) {
+        kill(pid_track, SIGINT);
+    }
+}
+
+void signalHandler() {
     struct sigaction action;
     action.sa_sigaction = ChildHandler;
-    sigfillset($action.sa_mask);
+    sigfillset(&action.sa_mask);
     action.sa_flags = SA_SIGINFO;
-    sigaction(SIGINT, &action, NULL);
-
-    fork();
+    sigaction(SIGCHLD, &action, NULL);
 
     while(1) {
         printf("PID:%d\n", getpid());
