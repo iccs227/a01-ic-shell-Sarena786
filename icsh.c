@@ -139,7 +139,6 @@ int cmdHandler(char **args) {
 
 void RunExternalCmd(char **args) {
     int pid;
-    pid_t pid_track = 0;
 
     if ((pid=fork()) < 0)
     {
@@ -156,6 +155,7 @@ void RunExternalCmd(char **args) {
     if(pid) {
         pid_track = pid;
         waitpid(pid, NULL, 0);
+        pid_track = 0;
     }
 } 
 
@@ -179,9 +179,11 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
         }
 }
 
-void Signal() {
+void SIGINTHandler() {
     if(pid_track > 0) {
         kill(pid_track, SIGINT);
+    } else {
+        printf("the process is interrupted.")
     }
 }
 
@@ -191,6 +193,13 @@ void signalHandler() {
     sigfillset(&action.sa_mask);
     action.sa_flags = SA_SIGINFO;
     sigaction(SIGCHLD, &action, NULL);
+
+
+    struct sigaction sa_int;
+    sa_int.sa_handler = SIGINTHandler;
+    sigemptyset(&sa_int.sa_mask);
+    sa_int.sa_flags = 0;
+    sigaction(SIGINT, &sa_int, NULL);
 
     while(1) {
         printf("PID:%d\n", getpid());
