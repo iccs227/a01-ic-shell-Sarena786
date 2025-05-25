@@ -20,6 +20,8 @@ int cmdHandler(char **args);
 void Run(FILE *fp);
 void RunExternalCmd(char **args);
 
+volatile sig_atomic_t pid_track = 0;
+
 int main(int argc, char *argv[]) {
     FILE *fp = NULL;
 
@@ -137,6 +139,7 @@ int cmdHandler(char **args) {
 
 void RunExternalCmd(char **args) {
     int pid;
+    pid_t pid_track = 0;
 
     if ((pid=fork()) < 0)
     {
@@ -151,6 +154,7 @@ void RunExternalCmd(char **args) {
     }
 
     if(pid) {
+        pid_track = pid;
         waitpid(pid, NULL, 0);
     }
 } 
@@ -177,8 +181,16 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
 
 void signalHandler(signal *sig) {
     struct sigaction action;
-    action.sa_sigaction = ChildHandler
+    action.sa_sigaction = ChildHandler;
     sigfillset($action.sa_mask);
-    sa
+    action.sa_flags = SA_SIGINFO;
+    sigaction(SIGINT, &action, NULL);
+
+    fork();
+
+    while(1) {
+        printf("PID:%d\n", getpid());
+        sleep(1);
+    }
 
 }
