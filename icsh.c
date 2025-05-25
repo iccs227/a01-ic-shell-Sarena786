@@ -25,7 +25,7 @@ void SIGINTHandler(int sig);
 void SIGTSTPHandler(int sig);
 
 volatile sig_atomic_t pid_track = 0;
-int last_exit_status = 0;
+int exit_status = 0;
 
 int main(int argc, char *argv[]) {
     FILE *fp = NULL;
@@ -121,12 +121,14 @@ int cmdHandler(char **args) {
 
     if(strcmp(args[0], "echo") == 0) {
         for(int i = 1; args[i] != NULL; i++) {
-            printf("%s ", args[i]);
-            if(args[i + 1] == NULL) {
-                printf(" ");
-            }   
+            if (strcmp(args[i], "$?") == 0) {
+                printf("%d ", exit_status);
+            } else {
+                printf("%s ", args[i]);
+            }      
         }
         printf("\n");
+        exit_status = 0;
         return 1;
 
     }
@@ -167,21 +169,21 @@ void RunExternalCmd(char **args) {
 
 void ChildHandler(int sig, siginfo_t *sip, void *notused) {
     int status;
-    printf ("The process generating the signal is PID: %d\n", sip->si_pid);
     fflush (stdout);
 
     status = 0; 
 
     if(waitpid (sip->si_pid, &status, WNOHANG) > 0) {
-        if (WIFEXITED(status)|| WTERMSIG(status))
-         last_exit_status = WIFEXITED(status);
-         last_exit_status = WTERMSIG(status);
-         printf ("The child is gone\n");
+        if (WIFEXITED(status)) {
+            exit_status = WEXITSTATUS(status);
+            printf ("The child exited.\n");
+        } else if (WIFSIGNALED(status)) {
+            exit_status = 128 + WTERMSIG(status);
+            printf("The child terminated.\n");
+        }
         else
          printf ("Uninteresting\n");
-    } else {
-            printf ("Uninteresting\n");
-        }
+    }
 }
 
 void SIGINTHandler(int sig) {
