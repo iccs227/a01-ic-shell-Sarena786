@@ -173,16 +173,19 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
 
     status = 0; 
 
-    if(waitpid (sip->si_pid, &status, WNOHANG) > 0) {
+    if(waitpid (sip->si_pid, &status, WNOHANG | WUNTRACED) > 0) {
         if (WIFEXITED(status)) {
             exit_status = WEXITSTATUS(status);
             printf ("The child exited.\n");
         } else if (WIFSIGNALED(status)) {
             exit_status = 128 + WTERMSIG(status);
-            printf("The child terminated.\n");
+            printf("The child was terminated.\n");
+        } else if (WIFSTOPPED(status)) {
+            exit_status = 128 + WSTOPSIG(status);
+            printf("The child was suspended.\n");
         }
-        else
-         printf ("Uninteresting\n");
+    else
+        printf ("Uninteresting\n");
     }
 }
 
