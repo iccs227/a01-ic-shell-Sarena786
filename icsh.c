@@ -166,7 +166,7 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
 
     status = 0; 
 
-    if(sip->si_pid == waitpid(sip->si_pid, &status, WNOHANG)) {
+    if(waitpid(pid_track, &status, WNOHANG) > 0) {
         if (WIFEXITED(status)|| WTERMSIG(status))
 
          printf ("The child is gone\n");
@@ -179,11 +179,21 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
         }
 }
 
-void SIGINTHandler() {
+void SIGINTHandler(int sig) {
     if(pid_track > 0) {
         kill(pid_track, SIGINT);
     } else {
-        printf("the process is interrupted.")
+        printf("the process is interrupted.\n");
+        fflush(stdout);
+    }
+}
+
+void SIGTSTPHandler(int sig) {
+    if(pid_track > 0) {
+        kill(pid_track, SIGTSTP);
+    } else {
+        printf("the process is interrupted.\n");
+        fflush(stdout);
     }
 }
 
@@ -200,6 +210,8 @@ void signalHandler() {
     sigemptyset(&sa_int.sa_mask);
     sa_int.sa_flags = 0;
     sigaction(SIGINT, &sa_int, NULL);
+
+    
 
     while(1) {
         printf("PID:%d\n", getpid());
