@@ -19,8 +19,13 @@ void ParseInput(char *buffer, char **args);
 int cmdHandler(char **args);
 void Run(FILE *fp);
 void RunExternalCmd(char **args);
+void signalHandler();
+void ChildHandler(int sig, siginfo_t *sip, void *notused);
+void SIGINTHandler(int sig);
+void SIGTSTPHandler(int sig);
 
 volatile sig_atomic_t pid_track = 0;
+int last_exit_status = 0;
 
 int main(int argc, char *argv[]) {
     FILE *fp = NULL;
@@ -34,7 +39,8 @@ int main(int argc, char *argv[]) {
     }
 
     printf("Starting IC Shell\n");
-
+    
+    signalHandler();
     Run(fp);
     
     if(fp != NULL) {
@@ -168,6 +174,8 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
 
     if(waitpid (sip->si_pid, &status, WNOHANG) > 0) {
         if (WIFEXITED(status)|| WTERMSIG(status))
+         last_exit_status = WIFEXITED(status);
+         last_exit_status = WTERMSIG(status);
          printf ("The child is gone\n");
         else
          printf ("Uninteresting\n");
@@ -179,28 +187,24 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
 void SIGINTHandler(int sig) {
     if(pid_track > 0) {
         kill(pid_track, SIGINT);
-    } else {
-        printf("the process is interrupted.\n");
-        fflush(stdout);
+        printf("Child process %d killed.\n", pid_track);
     }
 }
 
 void SIGTSTPHandler(int sig) {
     if(pid_track > 0) {
         kill(pid_track, SIGTSTP);
-    } else {
-        printf("the process is interrupted.\n");
-        fflush(stdout);
+        printf("Child process %d suspended.\n", pid_track);
     }
 }
 
 void signalHandler() {
+
     struct sigaction action;
     action.sa_sigaction = ChildHandler;
     sigfillset(&action.sa_mask);
     action.sa_flags = SA_SIGINFO;
     sigaction(SIGCHLD, &action, NULL);
-
 
     struct sigaction sa_int;
     sa_int.sa_handler = SIGINTHandler;
@@ -213,10 +217,5 @@ void signalHandler() {
     sigemptyset(&sa_tstp.sa_mask);
     sa_tstp.sa_flags = 0;
     sigaction(SIGTSTP, &sa_tstp, NULL);
-
-    while(1) {
-        printf("PID:%d\n", getpid());
-        sleep(1);
-    }
 
 }
