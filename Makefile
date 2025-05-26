@@ -1,11 +1,12 @@
 CC=gcc
 CFLAGS=-Wall -g 
 BINARY=icsh
+SRC = icsh.c command.c signal.c input.c
 
-all: icsh
+all: $(BINARY)
 
-icsh: icsh.c
-	$(CC) -o $(BINARY) $(CFLAGS) $<
+$(BINARY): $(SRC)
+	$(CC) $(CFLAGS) -o $(BINARY) $(SRC)
 
 .PHONY: clean
 
