@@ -6,5 +6,6 @@
 
 int getInput(char *buffer, FILE *fp);
 void ParseInput(char *buffer, char **args);
+void Run(FILE *fp);
 
 #endif
