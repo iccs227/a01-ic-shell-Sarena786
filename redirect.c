@@ -1,13 +1,12 @@
 #include<stdio.h>
 #include <fcntl.h>
 #include "input.h"
-
-int in = -1;
-int out = -1;
-size_t got;
-char buffer[1024];
+#include<string.h>
+#include <unistd.h>
 
 void redirect(char **args) {
+    int in = -1;
+    int out = -1;
     int j = 0;
     for(int i = 0; args[i] != NULL; i++) {
         if(strcmp(args[i], ">") == 0) {

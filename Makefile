@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -g 
 BINARY=icsh
-SRC = icsh.c command.c signal.c input.c
+SRC = icsh.c command.c signal.c input.c redirect.c
 
 all: $(BINARY)
 
