@@ -3,7 +3,10 @@
 #include "input.h"
 #include "command.h"
 #include "redirect.h"
+#include <unistd.h>
 
+
+int check_redirect = 0;
 int getInput(char *buffer, FILE *fp) {
     if(fp != NULL) {
         fgets(buffer, MAX_CMD_BUFFER, fp);
@@ -22,6 +25,9 @@ void ParseInput(char *buffer, char **args) {
     while(token != NULL) {
         args[i] = token;
         token = strtok(NULL, " ");
+        if(strcmp(args[i],">") == 0 || strcmp(args[i],"<") == 0) {
+            check_redirect = 1;
+        }
         i++;
     }
     args[i] = NULL;
@@ -60,9 +66,10 @@ void Run(FILE *fp) {
         if(args[0] == NULL) {
             continue;
         }
-
-        if(!cmdHandler(args)) {
+        if(check_redirect == 0 && cmdHandler(args)) {
+        } else {
             RunExternalCmd(args);
         }
+        check_redirect = 0;
     }
 }

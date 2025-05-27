@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include "command.h"
+#include "redirect.h"
 
 extern volatile sig_atomic_t pid_track;
 extern int exit_status;
@@ -51,6 +52,7 @@ void RunExternalCmd(char **args) {
     }
 
     if(!pid) {
+        redirect(args);
         execvp (args[0], args); // only return when there is an error
         printf("bad command\n");
         exit(1);
