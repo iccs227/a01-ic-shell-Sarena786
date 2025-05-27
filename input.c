@@ -2,6 +2,7 @@
 #include <string.h>
 #include "input.h"
 #include "command.h"
+#include "redirect.h"
 
 int getInput(char *buffer, FILE *fp) {
     if(fp != NULL) {
@@ -59,6 +60,7 @@ void Run(FILE *fp) {
         if(args[0] == NULL) {
             continue;
         }
+        redirect(args);
 
         if(!cmdHandler(args)) {
             RunExternalCmd(args);
