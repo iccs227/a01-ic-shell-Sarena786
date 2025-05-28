@@ -7,12 +7,9 @@
 #include "command.h"
 #include "redirect.h"
 #include "input.h"
+#include "job.h"
 
-extern volatile sig_atomic_t pid_track;
-extern int exit_status;
-
-extern int is_bg;
-extern char commands;
+volatile sig_atomic_t pid_track = 0;
 
 int cmdHandler(char **args) {
 
@@ -56,7 +53,6 @@ void RunExternalCmd(char **args) {
 
     if(!pid) {
         redirect(args);
-        commands = args[0];
         execvp (args[0], args); // only return when there is an error
         printf("bad command\n");
         exit(1);
@@ -67,5 +63,7 @@ void RunExternalCmd(char **args) {
         waitpid(pid, NULL, 0);
         pid_track = 0;
     } 
-
+    if(is_bg) {
+        keepJob(pid, commands);
+    }
 } 

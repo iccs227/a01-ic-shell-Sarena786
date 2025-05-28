@@ -13,9 +13,6 @@
 
 #define MAX_CMD_BUFFER 255
 
-volatile sig_atomic_t pid_track = 0;
-int exit_status = 0;
-
 int main(int argc, char *argv[]) {
     FILE *fp = NULL;
 

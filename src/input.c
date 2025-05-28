@@ -5,8 +5,8 @@
 #include "redirect.h"
 #include <unistd.h>
 
-extern int check_redirect = 0;
-extern int is_bg = 0;
+int check_redirect = 0;
+int is_bg = 0;
 
 int getInput(char *buffer, FILE *fp) {
     if(fp != NULL) {
@@ -31,7 +31,7 @@ void ParseInput(char *buffer, char **args) {
         }
         if(strcmp(args[i], "&") == 0) {
             is_bg = 1;
-            args[i] == NULL;
+            args[i] = NULL;
             break;
         }
         i++;
