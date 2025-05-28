@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "signal.h"
+#include "job.h"
+#include "input.h"
+#include <string.h>
 
 extern volatile sig_atomic_t pid_track;
 int exit_status = 0;
@@ -39,8 +42,20 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
 
     if(waitpid (sip->si_pid, &status, WNOHANG | WUNTRACED) > 0) {
         if (WIFEXITED(status)) {
-            exit_status = WEXITSTATUS(status);
-            printf ("The child exited.\n");
+            if (sip->si_pid == pid_track) {
+                exit_status = WEXITSTATUS(status);
+                pid_track = -1;
+                printf("The child exited.\n");
+            } else {
+                for (int i = 0; i < current_job; i++) {
+                    if (jobs[i].pid == sip->si_pid) {
+                        strncpy(jobs[i].status, "Done", sizeof(jobs[i].status));
+                        printf("[%d]+  Done\t\t%s\n", jobs[i].job_id, jobs[i].command);
+                        jobs[i].pid = -1;
+                        break;
+                    }
+                }
+            }
         } else if (WIFSIGNALED(status)) {
             exit_status = 128 + WTERMSIG(status);
             printf("The child was terminated.\n");

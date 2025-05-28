@@ -4,9 +4,10 @@
 #include "command.h"
 #include "redirect.h"
 #include <unistd.h>
+#include <signal.h>
 
 int check_redirect = 0;
-int is_bg = 0;
+volatile sig_atomic_t is_bg = 0;
 char cmdline[256] = {0};
 
 int getInput(char *buffer, FILE *fp) {
@@ -48,6 +49,8 @@ void Run(FILE *fp) {
     char *args[64];
 
     while (1) {
+        is_bg = 0;
+
         if(fp == NULL) {
             printf("icsh $ ");
         }
