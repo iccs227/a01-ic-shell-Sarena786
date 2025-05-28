@@ -31,6 +31,8 @@ void ParseInput(char *buffer, char **args) {
         }
         if(strcmp(args[i], "&") == 0) {
             is_bg = 1;
+            args[i] == NULL;
+            break;
         }
         i++;
     }
