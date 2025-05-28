@@ -41,7 +41,7 @@ int cmdHandler(char **args) {
     return 0;
 }
 
-void RunExternalCmd(char **args) {
+void RunExternalCmd(char **args, const char *cmdline) {
     
     int pid;
     

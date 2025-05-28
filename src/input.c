@@ -77,7 +77,7 @@ void Run(FILE *fp) {
         }
         if(check_redirect == 0 && cmdHandler(args) && !is_bg) {
         } else {
-            RunExternalCmd(args);
+            RunExternalCmd(args, buffer);
         }
         check_redirect = 0;
     }

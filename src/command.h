@@ -2,7 +2,7 @@
 #define COMMAND_H
 
 int cmdHandler(char **args);
-void RunExternalCmd(char **args);
+void RunExternalCmd(char **args, const char *cmdline);
 
 extern char commands;
 extern volatile sig_atomic_t pid_track;
