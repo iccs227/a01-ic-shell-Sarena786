@@ -7,5 +7,8 @@ extern int job_id = 1;
 void keepJob(pid_t pid, const char *command) {
     jobs[current_job].pid = pid;
     jobs[current_job].job_id = job_id++;
-    
+    strncpy(jobs[current_job].command, command, sizeof(jobs[current_job].command));
+    strncpy(jobs[current_job].status, "Running", sizeof(jobs[current_job].status));
+    printf("[%d] %d\n", jobs[current_job].job_id, pid);
+    current_job++;
 }
