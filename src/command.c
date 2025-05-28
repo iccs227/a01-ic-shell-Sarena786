@@ -11,6 +11,8 @@
 extern volatile sig_atomic_t pid_track;
 extern int exit_status;
 extern int is_bg;
+#define MAX_JOBS 256
+job jobs[MAX_JOBS];
 
 typedef struct {
     int job_id;
@@ -58,7 +60,7 @@ void RunExternalCmd(char **args) {
         exit(errno);
     }
 
-    if(!pid && is_bg != 1) {
+    if(!pid) {
         redirect(args);
         execvp (args[0], args); // only return when there is an error
         printf("bad command\n");
@@ -70,7 +72,7 @@ void RunExternalCmd(char **args) {
         waitpid(pid, NULL, 0);
         pid_track = 0;
     } else {
-        
+        job_id 
     }
 
 } 
