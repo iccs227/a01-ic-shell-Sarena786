@@ -64,6 +64,6 @@ void RunExternalCmd(char **args) {
         pid_track = 0;
     } 
     if(is_bg) {
-        keepJob(pid, commands);
+        keepJob(pid, cmdline);
     }
 } 
