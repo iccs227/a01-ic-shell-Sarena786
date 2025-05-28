@@ -27,11 +27,6 @@ void ParseInput(char *buffer, char **args) {
     while(token != NULL) {
         args[i] = token;
 
-        if(strcmp(token, "&") != 0) {
-            strcat(cmdline, token);
-            strcat(cmdline, " ");
-        }
-
         token = strtok(NULL, " ");
 
         if(strcmp(args[i],">") == 0 || strcmp(args[i],"<") == 0) {
@@ -45,11 +40,6 @@ void ParseInput(char *buffer, char **args) {
         i++;
     }
     args[i] = NULL;
-
-    int len = strlen(cmdline);
-    if (len > 0 && cmdline[len - 1] == ' ') {
-        cmdline[len - 1] = '\0';
-    }
 }
 
 void Run(FILE *fp) {
