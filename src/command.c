@@ -6,6 +6,7 @@
 #include <errno.h>
 #include "command.h"
 #include "redirect.h"
+#include "input.h"
 
 extern volatile sig_atomic_t pid_track;
 extern int exit_status;
@@ -27,7 +28,6 @@ int cmdHandler(char **args) {
         printf("\n");
         exit_status = 0;
         return 1;
-
     }
 
     else if (strcmp(args[0], "exit") == 0) {
@@ -37,14 +37,14 @@ int cmdHandler(char **args) {
         }
         printf("Bye\n");
         exit(code);
-    } 
-    
+    }
     return 0;
 }
 
 void RunExternalCmd(char **args) {
+    
     int pid;
-
+    
     if ((pid=fork()) < 0)
     {
         perror ("Fork failed");
@@ -58,9 +58,12 @@ void RunExternalCmd(char **args) {
         exit(1);
     }
 
-    if(pid) {
+    if(pid && is_bg != 1) {
         pid_track = pid;
         waitpid(pid, NULL, 0);
         pid_track = 0;
+    } else {
+        
     }
+
 } 

@@ -5,8 +5,9 @@
 #include "redirect.h"
 #include <unistd.h>
 
-
 int check_redirect = 0;
+int is_bg = 0;
+
 int getInput(char *buffer, FILE *fp) {
     if(fp != NULL) {
         fgets(buffer, MAX_CMD_BUFFER, fp);
@@ -27,6 +28,9 @@ void ParseInput(char *buffer, char **args) {
         token = strtok(NULL, " ");
         if(strcmp(args[i],">") == 0 || strcmp(args[i],"<") == 0) {
             check_redirect = 1;
+        }
+        if(strcmp(args[i], "&") == 0) {
+            is_bg = 1;
         }
         i++;
     }
@@ -66,7 +70,7 @@ void Run(FILE *fp) {
         if(args[0] == NULL) {
             continue;
         }
-        if(check_redirect == 0 && cmdHandler(args)) {
+        if(check_redirect == 0 && cmdHandler(args) && !is_bg) {
         } else {
             RunExternalCmd(args);
         }
