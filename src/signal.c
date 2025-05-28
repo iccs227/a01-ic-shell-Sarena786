@@ -7,7 +7,7 @@
 #include "signal.h"
 
 extern volatile sig_atomic_t pid_track;
-extern int exit_status;
+int exit_status = 0;
 
 void signalHandler() {
 

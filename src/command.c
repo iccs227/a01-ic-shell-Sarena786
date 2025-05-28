@@ -31,6 +31,11 @@ int cmdHandler(char **args) {
         return 1;
     }
 
+    else if (strcmp(args[0], "jobs") == 0) {
+        printJobs();
+        return 1;
+    }
+
     else if (strcmp(args[0], "exit") == 0) {
         int code = 0;
         if(args[1] != NULL) {
@@ -66,6 +71,5 @@ void RunExternalCmd(char **args, const char *cmdline) {
     } 
     if(is_bg) {
         keepJob(pid, cmdline);
-        printf("[%d] %d\n", job_id, pid);
     }
 } 

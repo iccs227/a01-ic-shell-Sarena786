@@ -19,9 +19,9 @@ void keepJob(int pid, const char *command) {
     current_job++;
 }
 
-void cmdJobs() {
-    for(int i = 0; i < current_job; i++){
-        if(strcmp(jobs[current_job].status, "Running") == 0) {
+void printJobs() {
+    for (int i = 0; i < current_job; i++) {
+        if (strcmp(jobs[i].status, "Running") == 0) {
             printf("[%d]  Running\t\t%s\n", jobs[i].job_id, jobs[i].command);
         }
     }

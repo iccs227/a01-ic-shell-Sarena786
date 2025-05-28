@@ -71,13 +71,15 @@ void Run(FILE *fp) {
             strcpy(lastCommand, buffer);
         }
 
+        strcpy(cmdline, buffer);
+
         ParseInput(buffer, args);
         if(args[0] == NULL) {
             continue;
         }
-        if(check_redirect == 0 && cmdHandler(args) && !is_bg) {
+        if(check_redirect == 0 && cmdHandler(args)) {
         } else {
-            RunExternalCmd(args, buffer);
+            RunExternalCmd(args, cmdline);
         }
         check_redirect = 0;
     }
