@@ -7,6 +7,7 @@
 
 int check_redirect = 0;
 int is_bg = 0;
+char cmdline[256] = {0};
 
 int getInput(char *buffer, FILE *fp) {
     if(fp != NULL) {
@@ -25,7 +26,14 @@ void ParseInput(char *buffer, char **args) {
     int i = 0;
     while(token != NULL) {
         args[i] = token;
+
+        if(strcmp(token, "&") != 0) {
+            strcat(cmdline, token);
+            strcat(cmdline, " ");
+        }
+
         token = strtok(NULL, " ");
+
         if(strcmp(args[i],">") == 0 || strcmp(args[i],"<") == 0) {
             check_redirect = 1;
         }
@@ -37,6 +45,11 @@ void ParseInput(char *buffer, char **args) {
         i++;
     }
     args[i] = NULL;
+
+    int len = strlen(cmdline);
+    if (len > 0 && cmdline[len - 1] == ' ') {
+        cmdline[len - 1] = '\0';
+    }
 }
 
 void Run(FILE *fp) {
