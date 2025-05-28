@@ -5,8 +5,8 @@
 #include "redirect.h"
 #include <unistd.h>
 
-int check_redirect = 0;
-int is_bg = 0;
+extern int check_redirect = 0;
+extern int is_bg = 0;
 
 int getInput(char *buffer, FILE *fp) {
     if(fp != NULL) {

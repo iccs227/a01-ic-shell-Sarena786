@@ -3,8 +3,8 @@
 #define INPUT_H
 
 #define MAX_CMD_BUFFER 255
-int check_redirect = 0;
-int is_bg = 0;
+extern int check_redirect;
+extern int is_bg;
 
 int getInput(char *buffer, FILE *fp);
 void ParseInput(char *buffer, char **args);

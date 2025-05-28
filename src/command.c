@@ -10,15 +10,9 @@
 
 extern volatile sig_atomic_t pid_track;
 extern int exit_status;
-extern int is_bg;
-#define MAX_JOBS 256
-job jobs[MAX_JOBS];
 
-typedef struct {
-    int job_id;
-    char status[16];
-    char command[256];
-} job;
+extern int is_bg;
+extern char commands;
 
 int cmdHandler(char **args) {
 
@@ -62,6 +56,7 @@ void RunExternalCmd(char **args) {
 
     if(!pid) {
         redirect(args);
+        commands = args[0];
         execvp (args[0], args); // only return when there is an error
         printf("bad command\n");
         exit(1);
@@ -71,8 +66,6 @@ void RunExternalCmd(char **args) {
         pid_track = pid;
         waitpid(pid, NULL, 0);
         pid_track = 0;
-    } else {
-        job_id 
-    }
+    } 
 
 } 

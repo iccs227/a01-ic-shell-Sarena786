@@ -4,4 +4,6 @@
 int cmdHandler(char **args);
 void RunExternalCmd(char **args);
 
+extern char commands;
+
 #endif
