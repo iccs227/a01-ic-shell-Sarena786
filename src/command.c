@@ -8,6 +8,7 @@
 #include "redirect.h"
 #include "input.h"
 #include "job.h"
+#include "signal.h"
 
 volatile sig_atomic_t pid_track = 0;
 
@@ -65,5 +66,6 @@ void RunExternalCmd(char **args, const char *cmdline) {
     } 
     if(is_bg) {
         keepJob(pid, cmdline);
+        printf("[%d] %d\n", job_id, pid);
     }
 } 

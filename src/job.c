@@ -1,5 +1,6 @@
 #include "job.h"
 #include<stdio.h>
+#include<string.h>
 
 job jobs[MAX_JOBS];
 int current_job = 0;
