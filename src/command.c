@@ -64,10 +64,11 @@ void RunExternalCmd(char **args, const char *cmdline) {
         exit(1);
     }
 
-    if(pid && is_bg != 1) {
+    if(pid && !is_bg) {
         pid_track = pid;
-        waitpid(pid, NULL, 0);
-        pid_track = 0;
+        while (pid_track == pid) {
+            pause();
+        }
     } 
     if(is_bg) {
         keepJob(pid, cmdline);

@@ -44,14 +44,14 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
         if (WIFEXITED(status)) {
             if (sip->si_pid == pid_track) {
                 exit_status = WEXITSTATUS(status);
-                pid_track = -1;
+                pid_track = 0;
                 printf("The child exited.\n");
             } else {
                 for (int i = 0; i < current_job; i++) {
                     if (jobs[i].pid == sip->si_pid) {
-                        strncpy(jobs[i].status, "Done", sizeof(jobs[i].status));
                         printf("[%d]+  Done\t\t%s\n", jobs[i].job_id, jobs[i].command);
                         jobs[i].pid = -1;
+                        strcpy(jobs[i].status, "Done");
                         break;
                     }
                 }
