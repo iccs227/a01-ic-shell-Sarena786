@@ -36,6 +36,17 @@ int cmdHandler(char **args) {
         return 1;
     }
 
+    else if (strcmp(args[0], "fg") == 0) {
+        if(args[1] == " " && args[2] == "%" && isdigit(args[3])) {
+            int id = atoi(&args[3]); // convert string to number
+            
+        }
+    }
+    {
+        /* code */
+    }
+    
+
     else if (strcmp(args[0], "exit") == 0) {
         int code = 0;
         if(args[1] != NULL) {

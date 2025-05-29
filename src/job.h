@@ -17,5 +17,6 @@ extern int job_id;
 
 void keepJob(int pid, const char *command);
 void printJobs();
+void to_fg(int id);
 
 #endif

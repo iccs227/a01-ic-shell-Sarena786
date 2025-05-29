@@ -26,3 +26,12 @@ void printJobs() {
         }
     }
 }
+
+void to_fg(int id) {
+    for(int i = 0; i < current_job; i++) {
+        if (jobs[i].job_id == id) {
+            
+        }
+    }
+
+}
