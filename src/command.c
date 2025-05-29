@@ -9,6 +9,7 @@
 #include "input.h"
 #include "job.h"
 #include "signal.h"
+#include <ctype.h>
 
 volatile sig_atomic_t pid_track = 0;
 
@@ -37,15 +38,12 @@ int cmdHandler(char **args) {
     }
 
     else if (strcmp(args[0], "fg") == 0) {
-        if(args[1] == " " && args[2] == "%" && isdigit(args[3])) {
-            int id = atoi(&args[3]); // convert string to number
-            
+        if(args[1] != NULL && args[1][0] == '%' && isdigit(args[1][1])) {
+            int id = atoi(&args[1][1]); // convert string to number
+            to_fg(id);
+            return 1;
         }
     }
-    {
-        /* code */
-    }
-    
 
     else if (strcmp(args[0], "exit") == 0) {
         int code = 0;
@@ -77,9 +75,8 @@ void RunExternalCmd(char **args, const char *cmdline) {
 
     if(pid && !is_bg) {
         pid_track = pid;
-        while (pid_track == pid) {
-            pause();
-        }
+        waitpid(pid, NULL, 0);
+        pid_track = 0;
     } 
     if(is_bg) {
         keepJob(pid, cmdline);

@@ -1,12 +1,17 @@
 #include "job.h"
-#include<stdio.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <signal.h>
+#include <string.h>
 #include "command.h"
+#include <sys/wait.h>
+#include <errno.h>
 
 job jobs[MAX_JOBS];
 int current_job = 0;
 int job_id = 1;
+job* fg_job = NULL;
 
 void keepJob(int pid, const char *command) {
     if (current_job >= MAX_JOBS) {
@@ -30,23 +35,25 @@ void printJobs() {
 }
 
 void to_fg(int id) {
+    int found = -1; 
+
     for(int i = 0; i < current_job; i++) {
         if (jobs[i].job_id == id) {
+            found = 1;
             kill(jobs[i].pid, SIGCONT);
             
             pid_track = jobs[i].pid; // set that process as the foreground job
+            fg_job = &jobs[i];
 
             printf("%s\n", jobs[i].command);
             fflush(stdout);
 
-            while (pid_track == jobs[i].pid) {
-                pause();
-            }
-
+            waitpid(pid_track, NULL, 0);
+            pid_track = 0;
             return;
         }
-        else {
-            printf("job not found\n");
-        }
+    }
+    if(!found) {
+        printf("Job not found./n");
     }
 }

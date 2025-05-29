@@ -8,8 +8,8 @@
 #include "job.h"
 #include "input.h"
 #include <string.h>
+#include "command.h"
 
-extern volatile sig_atomic_t pid_track;
 int exit_status = 0;
 
 void signalHandler() {
@@ -41,21 +41,12 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
     status = 0; 
 
     if(waitpid (sip->si_pid, &status, WNOHANG | WUNTRACED) > 0) {
+        if (sip->si_pid == pid_track) { // foreground has ended
+            pid_track = 0;
+        } 
         if (WIFEXITED(status)) {
-            if (sip->si_pid == pid_track) {
-                exit_status = WEXITSTATUS(status);
-                pid_track = 0;
-                printf("The child exited.\n");
-            } else {
-                for (int i = 0; i < current_job; i++) {
-                    if (jobs[i].pid == sip->si_pid) {
-                        printf("[%d]+  Done\t\t%s\n", jobs[i].job_id, jobs[i].command);
-                        jobs[i].pid = -1;
-                        strcpy(jobs[i].status, "Done");
-                        break;
-                    }
-                }
-            }
+            exit_status = WEXITSTATUS(status);
+            printf("The child exited.\n");
         } else if (WIFSIGNALED(status)) {
             exit_status = 128 + WTERMSIG(status);
             printf("The child was terminated.\n");
@@ -63,8 +54,20 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
             exit_status = 128 + WSTOPSIG(status);
             printf("The child was suspended.\n");
         }
-    else
-        printf ("Uninteresting\n");
+        
+        for (int i = 0; i < current_job; i++) {
+            if (jobs[i].pid == sip->si_pid) {
+                if (WIFEXITED(status)) {
+                    jobs[i].pid = -1;
+                    strcpy(jobs[i].status, "Done");
+                    printf("[%d]+  Done\t\t%s\n", jobs[i].job_id, jobs[i].command);
+                } else if (WIFSTOPPED(status) || WIFSIGNALED(status)) {
+                    strcpy(jobs[i].status, "Stopped");
+                    printf("[%d]+  Stopped\t\t%s\n", jobs[i].job_id, jobs[i].command);
+                }
+                break;
+            }
+        }
     }
 }
 

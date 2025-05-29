@@ -14,6 +14,7 @@ typedef struct {
 extern job jobs[MAX_JOBS];
 extern int current_job; 
 extern int job_id;
+extern job* fg_job;
 
 void keepJob(int pid, const char *command);
 void printJobs();
