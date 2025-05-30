@@ -40,18 +40,37 @@ void to_fg(int id) {
     for(int i = 0; i < current_job; i++) {
         if (jobs[i].job_id == id) {
             found = 1;
-            if(strcmp(jobs[i].status, "Running") == 0 || strcmp(jobs[i].status, "Stopped")) {
+            if(strcmp(jobs[i].status, "Running") == 0 || strcmp(jobs[i].status, "Stopped") == 0) {
                 pid_track = jobs[i].pid;
                 strcpy(jobs[i].status, "Running");
                 printf("%s\n", jobs[i].command);
+                tcsetpgrp(STDIN_FILENO, pid_track);
                 kill(-pid_track, SIGCONT);
-                waitpid(pid_track, NULL, WUNTRACED);
-            // fg_job = &jobs[i];
+
+
+                int status;
+                waitpid(pid_track, &status, WUNTRACED);
+                if (WIFSTOPPED(status)) {
+                    strcpy(jobs[i].status, "Stopped");
+                    printf("[%d]+  Stopped\t\t%s\n", jobs[i].job_id, jobs[i].command);
+                } 
+                tcsetpgrp(STDIN_FILENO, getpgrp());
             }
             break;
         }
     }
     if(!found) {
         printf("Job not found.\n");
+    }
+}
+
+void cont_bg(int id) {
+    for (int i = 0; i < current_job; i++) {
+        if (jobs[i].job_id == id && strcmp(jobs[i].status, "Stopped") == 0) {
+            strcpy(jobs[i].status, "Running");
+            kill(-jobs[i].pid, SIGCONT);
+            printf("[%d]+ %s &\n", jobs[i].job_id, jobs[i].command);
+            return;
+        }
     }
 }

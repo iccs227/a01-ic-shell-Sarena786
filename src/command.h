@@ -5,7 +5,9 @@
 int cmdHandler(char **args);
 void RunExternalCmd(char **args, const char *cmdline);
 
-extern char commands;
 extern volatile sig_atomic_t pid_track;
+extern pid_t group_id;
+extern pid_t shell_id;
+
 
 #endif

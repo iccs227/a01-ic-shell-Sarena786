@@ -11,6 +11,7 @@
 #include "command.h"
 #include <sys/types.h>
 
+extern volatile sig_atomic_t pid_track;
 int exit_status = 0;
 
 void signalHandler() {
@@ -37,11 +38,25 @@ void signalHandler() {
 
 void ChildHandler(int sig, siginfo_t *sip, void *notused) {
     int status;
+    pid_t pid;
     fflush (stdout);
 
-    status = 0; 
 
-    if(waitpid (sip->si_pid, &status, WNOHANG | WUNTRACED) > 0) {
+    while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED | WCONTINUED)) > 0) {
+        for(int i = 0; i < current_job; i++) {
+            if(jobs[i].pid == pid) {
+                if (WIFEXITED(status) || WIFSIGNALED(status)) {
+                    strcpy(jobs[i].status, "Done");
+                    printf("\n[%d]+  Done\t\t%s\n", jobs[i].job_id, jobs[i].command);
+                } else if (WIFSTOPPED(status)) {
+                    strcpy(jobs[i].status, "Stopped");
+                    printf("\n[%d]+  Stopped\t\t%s\n", jobs[i].job_id, jobs[i].command);
+                } else if (WIFCONTINUED(status)) {
+                    strcpy(jobs[i].status, "Running");
+                }
+                break;
+            }
+        }
         if (WIFEXITED(status)) {
             exit_status = WEXITSTATUS(status);
             printf ("The child exited.\n");
@@ -59,7 +74,7 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
 
 void SIGINTHandler(int sig) {
     if(pid_track > 0) {
-        kill(pid_track, SIGINT); // send the signal to entire group process
+        kill(pid_track, SIGINT);
         printf("Child process %d killed.\n", pid_track);
     }
 }
@@ -67,7 +82,6 @@ void SIGINTHandler(int sig) {
 void SIGTSTPHandler(int sig) {
     if(pid_track > 0) {
         kill(pid_track, SIGTSTP);
+        printf("Child process %d suspended.\n", pid_track);
     }
 }
-
-

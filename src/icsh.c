@@ -10,10 +10,22 @@
 #include <string.h>
 #include <stdlib.h>
 #include <signal.h>
+#include "command.h"
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define MAX_CMD_BUFFER 255
 
+pid_t shell_id;
+
 int main(int argc, char *argv[]) {
+
+    setpgid(0, 0);
+    tcsetpgrp(STDIN_FILENO, getpid());
+    signal(SIGTTOU, SIG_IGN);
+    signal(SIGTTIN, SIG_IGN);
+    
     FILE *fp = NULL;
 
     if(argc > 1) {
@@ -25,7 +37,7 @@ int main(int argc, char *argv[]) {
     }
 
     printf("Starting IC Shell\n");
-    
+
     signalHandler();
     Run(fp);
     

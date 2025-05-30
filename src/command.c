@@ -15,6 +15,7 @@
 
 
 volatile sig_atomic_t pid_track = 0;
+pid_t group_id;
 
 int cmdHandler(char **args) {
 
@@ -46,6 +47,13 @@ int cmdHandler(char **args) {
             to_fg(id);
             return 1;
         }
+    }
+    else if (strcmp(args[0], "bg") == 0) {
+         if(args[1] && args[1][0] == '%') {
+            int job_id = atoi(args[1] + 1);
+            cont_bg(job_id);
+            return 1;
+         }
     }
 
     else if (strcmp(args[0], "exit") == 0) {
@@ -82,6 +90,7 @@ void RunExternalCmd(char **args, const char *cmdline) {
         pid_track = 0;
     } 
     if(is_bg) {
+        is_bg = 0;
         keepJob(pid, cmdline);
     }
-}
+} 

@@ -19,5 +19,6 @@ extern job* fg_job;
 void keepJob(int pid, const char *command);
 void printJobs();
 void to_fg(int id);
+void cont_bg(int id);
 
 #endif
