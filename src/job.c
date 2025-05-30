@@ -34,6 +34,19 @@ void printJobs() {
     }
 }
 
+void clean_jobs(pid_t pid) {int found = 0;
+    for (int i = 0; i < current_job; i++) {
+        if (jobs[i].pid == pid) {
+            found = 1;
+            for (int j = i; j < current_job - 1; j++) {
+                jobs[j] = jobs[j + 1];
+            }
+            current_job--;
+            break;
+        }
+    }
+}
+
 void to_fg(int id) {
     int found = -1; 
 
