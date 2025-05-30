@@ -9,6 +9,7 @@
 #include "input.h"
 #include <string.h>
 #include "command.h"
+#include <sys/types.h>
 
 int exit_status = 0;
 
@@ -41,12 +42,9 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
     status = 0; 
 
     if(waitpid (sip->si_pid, &status, WNOHANG | WUNTRACED) > 0) {
-        if (sip->si_pid == pid_track) { // foreground has ended
-            pid_track = 0;
-        } 
         if (WIFEXITED(status)) {
             exit_status = WEXITSTATUS(status);
-            printf("The child exited.\n");
+            printf ("The child exited.\n");
         } else if (WIFSIGNALED(status)) {
             exit_status = 128 + WTERMSIG(status);
             printf("The child was terminated.\n");
@@ -54,26 +52,14 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
             exit_status = 128 + WSTOPSIG(status);
             printf("The child was suspended.\n");
         }
-        
-        for (int i = 0; i < current_job; i++) {
-            if (jobs[i].pid == sip->si_pid) {
-                if (WIFEXITED(status)) {
-                    jobs[i].pid = -1;
-                    strcpy(jobs[i].status, "Done");
-                    printf("[%d]+  Done\t\t%s\n", jobs[i].job_id, jobs[i].command);
-                } else if (WIFSTOPPED(status) || WIFSIGNALED(status)) {
-                    strcpy(jobs[i].status, "Stopped");
-                    printf("[%d]+  Stopped\t\t%s\n", jobs[i].job_id, jobs[i].command);
-                }
-                break;
-            }
-        }
+    else
+        printf ("Uninteresting\n");
     }
 }
 
 void SIGINTHandler(int sig) {
     if(pid_track > 0) {
-        kill(pid_track, SIGINT);
+        kill(pid_track, SIGINT); // send the signal to entire group process
         printf("Child process %d killed.\n", pid_track);
     }
 }
@@ -81,7 +67,6 @@ void SIGINTHandler(int sig) {
 void SIGTSTPHandler(int sig) {
     if(pid_track > 0) {
         kill(pid_track, SIGTSTP);
-        printf("Child process %d suspended.\n", pid_track);
     }
 }
 

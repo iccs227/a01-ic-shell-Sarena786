@@ -5,6 +5,7 @@
 #include "redirect.h"
 #include <unistd.h>
 #include <signal.h>
+#include <sys/types.h>
 
 int check_redirect = 0;
 volatile sig_atomic_t is_bg = 0;
@@ -25,6 +26,7 @@ int getInput(char *buffer, FILE *fp) {
 void ParseInput(char *buffer, char **args) {
     char *token = strtok(buffer, " ");
     int i = 0;
+
     while(token != NULL) {
         args[i] = token;
 
@@ -49,8 +51,6 @@ void Run(FILE *fp) {
     char *args[64];
 
     while (1) {
-        is_bg = 0;
-
         if(fp == NULL) {
             printf("icsh $ ");
         }

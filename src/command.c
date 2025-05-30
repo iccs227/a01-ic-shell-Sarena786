@@ -10,6 +10,9 @@
 #include "job.h"
 #include "signal.h"
 #include <ctype.h>
+#include <sys/types.h>
+#include <termios.h>
+
 
 volatile sig_atomic_t pid_track = 0;
 
@@ -58,7 +61,7 @@ int cmdHandler(char **args) {
 
 void RunExternalCmd(char **args, const char *cmdline) {
     
-    int pid;
+    pid_t pid;
     
     if ((pid=fork()) < 0)
     {
@@ -73,7 +76,7 @@ void RunExternalCmd(char **args, const char *cmdline) {
         exit(1);
     }
 
-    if(pid && !is_bg) {
+    if(pid && is_bg != 1) {
         pid_track = pid;
         waitpid(pid, NULL, 0);
         pid_track = 0;
@@ -81,4 +84,4 @@ void RunExternalCmd(char **args, const char *cmdline) {
     if(is_bg) {
         keepJob(pid, cmdline);
     }
-} 
+}

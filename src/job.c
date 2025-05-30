@@ -13,7 +13,7 @@ int current_job = 0;
 int job_id = 1;
 job* fg_job = NULL;
 
-void keepJob(int pid, const char *command) {
+void keepJob(pid_t pid, const char *command) {
     if (current_job >= MAX_JOBS) {
         printf("Maximum job limit reached.\n");
         return;
@@ -28,8 +28,8 @@ void keepJob(int pid, const char *command) {
 
 void printJobs() {
     for (int i = 0; i < current_job; i++) {
-        if (strcmp(jobs[i].status, "Running") == 0) {
-            printf("[%d]  Running\t\t%s\n", jobs[i].job_id, jobs[i].command);
+        if (strcmp(jobs[i].status, "Running") == 0 || strcmp(jobs[i].status, "Stopped") == 0) {
+            printf("[%d] %-10s %s\n", jobs[i].job_id, jobs[i].status, jobs[i].command);
         }
     }
 }
@@ -40,20 +40,18 @@ void to_fg(int id) {
     for(int i = 0; i < current_job; i++) {
         if (jobs[i].job_id == id) {
             found = 1;
-            kill(jobs[i].pid, SIGCONT);
-            
-            pid_track = jobs[i].pid; // set that process as the foreground job
-            fg_job = &jobs[i];
-
-            printf("%s\n", jobs[i].command);
-            fflush(stdout);
-
-            waitpid(pid_track, NULL, 0);
-            pid_track = 0;
-            return;
+            if(strcmp(jobs[i].status, "Running") == 0 || strcmp(jobs[i].status, "Stopped")) {
+                pid_track = jobs[i].pid;
+                strcpy(jobs[i].status, "Running");
+                printf("%s\n", jobs[i].command);
+                kill(-pid_track, SIGCONT);
+                waitpid(pid_track, NULL, WUNTRACED);
+            // fg_job = &jobs[i];
+            }
+            break;
         }
     }
     if(!found) {
-        printf("Job not found./n");
+        printf("Job not found.\n");
     }
 }
