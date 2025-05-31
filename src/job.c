@@ -51,10 +51,11 @@ void clean_jobs(pid_t pid) {
 
 void to_fg(int id) {
     pid_t pid;
-
+    int found = 0;
     for(int i = 0; i < current_job; i++) {
         if (jobs[i].job_id == id) {
             if(strcmp(jobs[i].status, "Running") == 0 || strcmp(jobs[i].status, "Stopped") == 0) {
+                found = 1;
                 pid = jobs[i].pid;
                 strcpy(jobs[i].status, "Running");
 
@@ -76,16 +77,20 @@ void to_fg(int id) {
 
                 }
                 break;
-            } else {
-                printf("Job %d not found.\n", id);
             }
         }
+
+    if(!found) {
+        printf("Job %d not found.\n", id);
     }
+}
 
 void cont_bg(int id) {
     pid_t pid;
+    int found = 0;
     for (int i = 0; i < current_job; i++) {
         if (jobs[i].job_id == id && strcmp(jobs[i].status, "Stopped") == 0) {
+            found = 1;
             pid = jobs[i].pid;
             strcpy(jobs[i].status, "Running");
             printf("\n[%d]  %s\t\t%s\n", jobs[i].job_id, jobs[i].status, jobs[i].command);
@@ -93,8 +98,9 @@ void cont_bg(int id) {
             kill(-pid, SIGCONT);
 
             return;
-        } else {
-            printf("Job [%d] not found.\n", id);
         }
+    }
+    if(!found) {
+        printf("Job %d not found.\n", id);
     }
 }
