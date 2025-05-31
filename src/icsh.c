@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
     tcsetpgrp(STDIN_FILENO, shell_id);
     signal(SIGTTOU, SIG_IGN);
     signal(SIGTTIN, SIG_IGN);
+    signalHandler();
     printf("Shell PID: %d, PGID: %d\n", shell_id, getpgrp());
 
     FILE *fp = NULL;
@@ -40,7 +41,6 @@ int main(int argc, char *argv[]) {
 
     printf("Starting IC Shell\n");
 
-    signalHandler();
     Run(fp);
     
     if(fp != NULL) {

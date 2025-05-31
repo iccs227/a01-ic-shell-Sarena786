@@ -59,10 +59,9 @@ void to_fg(int id) {
             if(strcmp(jobs[i].status, "Running") == 0 || strcmp(jobs[i].status, "Stopped") == 0) {
                 pid = jobs[i].pid;
                 strcpy(jobs[i].status, "Running");
-                printf("%s\n", jobs[i].command);
 
+                printf("%s\n", jobs[i].command);
                 printf("Debug: Bringing job %d to foreground\n", id);
-                printf("Debug: Sending SIGCONT to PID %d\n", pid);
                 
                 tcsetpgrp(STDIN_FILENO, pid);
                 kill(-pid, SIGCONT);
@@ -73,7 +72,6 @@ void to_fg(int id) {
                 waitpid(pid_track, &status, WUNTRACED);
 
                 tcsetpgrp(STDIN_FILENO, shell_id);
-
                 pid_track = -1;
 
                 if(WIFSTOPPED(status)) {
@@ -94,12 +92,23 @@ void to_fg(int id) {
 }
 
 void cont_bg(int id) {
-    for (int i = 0; i < current_job; i++) {
-        if (jobs[i].job_id == id && strcmp(jobs[i].status, "Stopped") == 0) {
-            strcpy(jobs[i].status, "Running");
-            kill(-jobs[i].pid, SIGCONT);
-            printf("[%d]+ %s &\n", jobs[i].job_id, jobs[i].command);
-            return;
+    int found = 1;
+    pid_t pid;
+
+    if(found) {
+        for (int i = 0; i < current_job; i++) {
+            if (jobs[i].job_id == id && strcmp(jobs[i].status, "Stopped") == 0) {
+                pid = jobs[i].pid;
+                strcpy(jobs[i].status, "Running");
+                printf("[%d]+ %s &\n", jobs[i].job_id, jobs[i].command);
+
+                printf("Debug: Resuming job [%d] (PID %d) in background\n", id, pid);
+                kill(-jobs[i].pid, SIGCONT);
+
+                return;
+            }
         }
+    } else {
+        printf("Job [%d] not found.\n", id);
     }
 }

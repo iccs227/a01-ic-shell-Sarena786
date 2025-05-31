@@ -109,6 +109,13 @@ void RunExternalCmd(char **args, const char *cmdline) {
             tcsetpgrp(STDIN_FILENO, shell_id);
 
             pid_track = -1;
+
+            if (WIFSTOPPED(status)  ) {
+                printf("The process %d is suspended.\n", pid);
+            } else {
+                printf("The process %d is done.\n", pid);
+                clean_jobs(pid);
+            }
             
         } else {
             is_bg = 0;
