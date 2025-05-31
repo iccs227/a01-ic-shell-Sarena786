@@ -53,4 +53,4 @@ What helped me fix it:
 - When I create a child process to run a command, I restore the default signal handlers in that child.  
 - This way, signals like Ctrl+C and Ctrl+Z work correctly for the running command, not the shell itself.
 
-Signal things are tricky for me. T-T
+Signal things are very tricky for me. T-T
