@@ -5,7 +5,7 @@
 
 #define MAX_CMD_BUFFER 255
 extern int check_redirect;
-extern volatile sig_atomic_t is_bg;
+extern int is_bg;
 extern char cmdline[256];
 
 int getInput(char *buffer, FILE *fp);

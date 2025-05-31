@@ -8,47 +8,47 @@
 #include <sys/types.h>
 
 int check_redirect = 0;
-volatile sig_atomic_t is_bg = 0;
+int is_bg = 0;
 char cmdline[256] = {0};
 
 int getInput(char *buffer, FILE *fp) {
     if(fp != NULL) {
-        fgets(buffer, MAX_CMD_BUFFER, fp);
-        buffer[strcspn(buffer, "\n")] = 0;
-        return 0;
-    } else if (fgets(buffer, MAX_CMD_BUFFER, stdin) != NULL) {
-        buffer[strcspn(buffer, "\n")] = 0;
+        fgets(buffer, MAX_CMD_BUFFER, fp); // use fgets to read a line from a file
+        buffer[strcspn(buffer, "\n")] = 0; // clean a line
+        return 0;   
+    } else if (fgets(buffer, MAX_CMD_BUFFER, stdin) != NULL) { // reading from input
+        buffer[strcspn(buffer, "\n")] = 0; // clean a line
         return 0;
     }
     return -1;
 }
 
 void ParseInput(char *buffer, char **args) {
-    char *token = strtok(buffer, " ");
+    char *token = strtok(buffer, " "); // tokenize the input string
     int i = 0;
 
     while(token != NULL) {
-        args[i] = token;
+        args[i] = token; // save each token into args[]
 
-        token = strtok(NULL, " ");
+        token = strtok(NULL, " "); // continue parsing 
 
-        if(strcmp(args[i],">") == 0 || strcmp(args[i],"<") == 0) {
+        if(strcmp(args[i],">") == 0 || strcmp(args[i],"<") == 0) { // to detect redirection
             check_redirect = 1;
         }
-        if(strcmp(args[i], "&") == 0) {
+        if(strcmp(args[i], "&") == 0) { // to detect background execution
             is_bg = 1;
             args[i] = NULL;
             break;
         }
         i++;
     }
-    args[i] = NULL;
+    args[i] = NULL; 
 }
 
 void Run(FILE *fp) {
-    char buffer[MAX_CMD_BUFFER];
-    char lastCommand[MAX_CMD_BUFFER] = {0};
-    char *args[64];
+    char buffer[MAX_CMD_BUFFER]; // store current line
+    char lastCommand[MAX_CMD_BUFFER] = {0}; // store prev. command
+    char *args[64]; // tokens
 
     while (1) {
         if(fp == NULL) {
@@ -59,7 +59,7 @@ void Run(FILE *fp) {
             if(fp != NULL) {
                 break;
             }
-            clearerr(stdin);
+            clearerr(stdin); // clear the error and prompt again
             continue;
         }
 
@@ -71,18 +71,18 @@ void Run(FILE *fp) {
             printf("%s\n", lastCommand);
             strcpy(buffer, lastCommand);
         } else {
-            strcpy(lastCommand, buffer);
+            strcpy(lastCommand, buffer); // update last command
         }
 
-        strcpy(cmdline, buffer);
+        strcpy(cmdline, buffer); // save a copy of full command
 
-        ParseInput(buffer, args);
+        ParseInput(buffer, args); // break into separate tokens
         if(args[0] == NULL) {
             continue;
         }
-        if(check_redirect == 0 && cmdHandler(args)) {
+        if(check_redirect == 0 && cmdHandler(args)) { // alrd executed in cmdHandler
         } else {
-            RunExternalCmd(args, cmdline);
+            RunExternalCmd(args, cmdline); 
         }
         check_redirect = 0;
     }
