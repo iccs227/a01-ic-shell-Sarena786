@@ -30,7 +30,6 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
 
 
     while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED | WCONTINUED)) > 0) {
-        printf("Debug: Caught child signal for PID %d\n", pid);
         for(int i = 0; i < current_job; i++) {
             if(jobs[i].pid == pid) {
                 if (WIFEXITED(status) || WIFSIGNALED(status)) {

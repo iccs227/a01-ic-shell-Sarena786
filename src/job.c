@@ -18,11 +18,11 @@ void keepJob(pid_t pid, const char *command) {
         printf("Maximum job limit reached.\n");
         return;
     }
+
     jobs[current_job].pid = pid;
     jobs[current_job].job_id = job_id++;
     strncpy(jobs[current_job].command, command, sizeof(jobs[current_job].command));
     strncpy(jobs[current_job].status, "Running", sizeof(jobs[current_job].status));
-    printf("Debug: Added job [%d] with PID %d, command: %s\n", jobs[current_job].job_id, pid, command);
     printf("[%d] %d\n", jobs[current_job].job_id, pid);
     current_job++;
 }
@@ -30,7 +30,7 @@ void keepJob(pid_t pid, const char *command) {
 void printJobs() {
     for (int i = 0; i < current_job; i++) {
         if (strcmp(jobs[i].status, "Running") == 0 || strcmp(jobs[i].status, "Stopped") == 0) {
-            printf("[%d] %-10s %s\n", jobs[i].job_id, jobs[i].status, jobs[i].command);
+            printf("\n[%d]  %s\t\t%s\n", jobs[i].job_id,jobs[i].status ,jobs[i].command);
         }
     }
 }
@@ -38,7 +38,6 @@ void printJobs() {
 void clean_jobs(pid_t pid) {
     for (int i = 0; i < current_job; i++) {
         if (jobs[i].pid == pid) {
-            printf("Debug: Cleaning job [%d] with PID %d\n", jobs[i].job_id, pid);
             for (int j = i; j < current_job - 1; j++) {
                 jobs[j] = jobs[j + 1];
             }
@@ -61,7 +60,6 @@ void to_fg(int id) {
                 strcpy(jobs[i].status, "Running");
 
                 printf("%s\n", jobs[i].command);
-                printf("Debug: Bringing job %d to foreground\n", id);
                 
                 tcsetpgrp(STDIN_FILENO, pid);
                 kill(-pid, SIGCONT);
@@ -100,10 +98,9 @@ void cont_bg(int id) {
             if (jobs[i].job_id == id && strcmp(jobs[i].status, "Stopped") == 0) {
                 pid = jobs[i].pid;
                 strcpy(jobs[i].status, "Running");
-                printf("[%d]+ %s &\n", jobs[i].job_id, jobs[i].command);
+                printf("\n[%d]  %s\t\t%s\n", jobs[i].job_id, jobs[i].status, jobs[i].command);
 
-                printf("Debug: Resuming job [%d] (PID %d) in background\n", id, pid);
-                kill(-jobs[i].pid, SIGCONT);
+                kill(-pid, SIGCONT);
 
                 return;
             }
