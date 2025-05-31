@@ -11,7 +11,7 @@
 #include "command.h"
 #include <sys/types.h>
 
-// extern volatile sig_atomic_t pid_track;
+extern volatile sig_atomic_t pid_fg;
 extern int exit_status;
 
 void signalHandler() {
@@ -72,4 +72,16 @@ void exit_handler(int status, pid_t pid, int i) {
         printf("The process %d was terminated.\n", pid);
         }
     }
-} 
+}
+
+void forward_sigint(int sig) {
+    if (pid_fg > 0) {
+        kill(-pid_fg, SIGINT); // forward Ctrl+C
+    }
+}
+
+void forward_sigtstp(int sig) {
+    if (pid_fg > 0) {
+        kill(-pid_fg, SIGTSTP); // forward Ctrl+Z
+    }
+}

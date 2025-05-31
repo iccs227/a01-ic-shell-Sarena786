@@ -13,10 +13,9 @@
 #include <sys/types.h>
 #include <termios.h>
 
-
-volatile sig_atomic_t pid_track = 0;
-pid_t group_id;
+extern volatile sig_atomic_t pid_fg;
 extern int exit_status;
+extern pid_t shell_id;
 
 int cmdHandler(char **args) {
 
@@ -63,7 +62,7 @@ int cmdHandler(char **args) {
             code = atoi(args[1]) & 0xFF;
         }
         printf("Bye\n");
-        exit(code);
+        exit(code); // exit immediately
     }
     return 0;
 }
@@ -100,20 +99,20 @@ void RunExternalCmd(char **args, const char *cmdline) {
     if(pid) { // parent process
 
         setpgid(pid, pid); // set child's process group
-        printf("Child PID: %d, PGID: %d\n", pid, getpgid(pid));
+        // printf("Child PID: %d, PGID: %d\n", pid, getpgid(pid)); 
 
         if(!is_bg) {
 
-            pid_track = pid; // track foreground pid for signal forwarding
+            pid_fg = pid; // track current foreground pid for signal forwarding
             
-            tcsetpgrp(STDIN_FILENO, pid); // give terminal control to the child process
+            tcsetpgrp(STDIN_FILENO, pid); // give terminal control to foreground job
 
             int status;
             waitpid(pid, &status, WUNTRACED);
 
             tcsetpgrp(STDIN_FILENO, shell_id);
 
-            pid_track = -1;
+            pid_fg = 0;
 
             exit_handler(status, pid, -1);
         } else {
