@@ -72,13 +72,16 @@ void to_fg(int id) {
                 int status;
                 waitpid(pid_track, &status, WUNTRACED);
 
-                tcsetpgrp(STDIN_FILENO, getpgrp());
+                tcsetpgrp(STDIN_FILENO, shell_id);
 
                 pid_track = -1;
 
                 if(WIFSTOPPED(status)) {
-                    strcpy(jobs[i].status, "Stopped"); 
-                } else {
+                    strcpy(jobs[i].status, "Stopped");
+                    printf("\n[%d]  %s\t\t%s\n", jobs[i].job_id, jobs[i].status, jobs[i].command);
+                } else if (WIFEXITED(status) || WIFSIGNALED(status)) {
+                    strcpy(jobs[i].status, "Done");
+                    printf("\n[%d]  %s\t\t%s\n", jobs[i].job_id, jobs[i].status, jobs[i].command);
                     clean_jobs(pid);
                 }
             }

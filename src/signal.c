@@ -49,13 +49,13 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
                 if (WIFEXITED(status) || WIFSIGNALED(status)) {
                     strcpy(jobs[i].status, "Done");
                     printf("\n[%d]  Done\t\t%s\n", jobs[i].job_id, jobs[i].command);
-                    clean_jobs(pid);    
+                    clean_jobs(pid);
                 } else if (WIFSTOPPED(status)) {
                     strcpy(jobs[i].status, "Stopped");
                     printf("\n[%d]  Stopped\t\t%s\n", jobs[i].job_id, jobs[i].command);
                 } else if (WIFCONTINUED(status)) {
                     strcpy(jobs[i].status, "Running");
-                }
+                } 
                 break;
             }
         }
