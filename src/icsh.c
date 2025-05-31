@@ -21,11 +21,13 @@ pid_t shell_id;
 
 int main(int argc, char *argv[]) {
 
+    shell_id = getpid();
     setpgid(0, 0);
-    tcsetpgrp(STDIN_FILENO, getpid());
+    tcsetpgrp(STDIN_FILENO, shell_id);
     signal(SIGTTOU, SIG_IGN);
     signal(SIGTTIN, SIG_IGN);
-    
+    printf("Shell PID: %d, PGID: %d\n", shell_id, getpgrp());
+
     FILE *fp = NULL;
 
     if(argc > 1) {

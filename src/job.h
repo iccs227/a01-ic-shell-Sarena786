@@ -20,5 +20,6 @@ void keepJob(int pid, const char *command);
 void printJobs();
 void to_fg(int id);
 void cont_bg(int id);
+void clean_jobs(pid_t pid);
 
 #endif

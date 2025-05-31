@@ -11,7 +11,7 @@
 #include "command.h"
 #include <sys/types.h>
 
-extern volatile sig_atomic_t pid_track;
+// extern volatile sig_atomic_t pid_track;
 int exit_status = 0;
 
 void signalHandler() {
@@ -43,15 +43,16 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
 
 
     while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED | WCONTINUED)) > 0) {
+        printf("Debug: Caught child signal for PID %d\n", pid);
         for(int i = 0; i < current_job; i++) {
             if(jobs[i].pid == pid) {
                 if (WIFEXITED(status) || WIFSIGNALED(status)) {
                     strcpy(jobs[i].status, "Done");
-                    printf("\n[%d]+  Done\t\t%s\n", jobs[i].job_id, jobs[i].command);
-                    clean_jobs(pid);
+                    printf("\n[%d]  Done\t\t%s\n", jobs[i].job_id, jobs[i].command);
+                    clean_jobs(pid);    
                 } else if (WIFSTOPPED(status)) {
                     strcpy(jobs[i].status, "Stopped");
-                    printf("\n[%d]+  Stopped\t\t%s\n", jobs[i].job_id, jobs[i].command);
+                    printf("\n[%d]  Stopped\t\t%s\n", jobs[i].job_id, jobs[i].command);
                 } else if (WIFCONTINUED(status)) {
                     strcpy(jobs[i].status, "Running");
                 }
@@ -61,12 +62,15 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
         if (WIFEXITED(status)) {
             exit_status = WEXITSTATUS(status);
             printf ("The child exited.\n");
+            printf("Debug: PID %d exited with status %d\n", pid, exit_status);
         } else if (WIFSIGNALED(status)) {
             exit_status = 128 + WTERMSIG(status);
             printf("The child was terminated.\n");
+            printf("Debug: PID %d terminated by signal %d\n", pid, WTERMSIG(status));
         } else if (WIFSTOPPED(status)) {
             exit_status = 128 + WSTOPSIG(status);
             printf("The child was suspended.\n");
+            printf("Debug: PID %d stopped by signal %d\n", pid, WSTOPSIG(status));
         }
     else
         printf ("Uninteresting\n");
@@ -75,14 +79,14 @@ void ChildHandler(int sig, siginfo_t *sip, void *notused) {
 
 void SIGINTHandler(int sig) {
     if(pid_track > 0) {
-        kill(pid_track, SIGINT);
+        kill(-pid_track, SIGINT);
         printf("Child process %d killed.\n", pid_track);
     }
 }
 
 void SIGTSTPHandler(int sig) {
     if(pid_track > 0) {
-        kill(pid_track, SIGTSTP);
+        kill(-pid_track, SIGTSTP);
         printf("Child process %d suspended.\n", pid_track);
     }
 }

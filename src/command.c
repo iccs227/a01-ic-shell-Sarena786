@@ -77,20 +77,42 @@ void RunExternalCmd(char **args, const char *cmdline) {
         exit(errno);
     }
 
-    if(!pid) {
+    if(!pid) { // child process
+        setpgid(0, 0);
+
+        if (!is_bg) {
+            tcsetpgrp(STDIN_FILENO, getpid()); // terminal controls this process group
+        }
+
         redirect(args);
         execvp (args[0], args); // only return when there is an error
+
         printf("bad command\n");
         exit(1);
     }
 
-    if(pid && is_bg != 1) {
-        pid_track = pid;
-        waitpid(pid, NULL, 0);
-        pid_track = 0;
-    } 
-    if(is_bg) {
-        is_bg = 0;
-        keepJob(pid, cmdline);
+    if(pid) { // parent process
+
+        setpgid(pid, pid); // set child's process group
+        
+        printf("Child PID: %d, PGID: %d\n", pid, getpgid(pid));
+
+        if(!is_bg) {
+
+            pid_track = pid; // track foreground pid for signal forwarding
+            
+            tcsetpgrp(STDIN_FILENO, pid); // give terminal control to the child process
+
+            int status;
+            waitpid(pid, &status, WUNTRACED);
+
+            tcsetpgrp(STDIN_FILENO, shell_id);
+
+            pid_track = -1;
+            
+        } else {
+            is_bg = 0;
+            keepJob(pid, cmdline);
+        }
     }
 } 
