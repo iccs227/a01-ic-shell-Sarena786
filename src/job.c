@@ -79,7 +79,6 @@ void to_fg(int id) {
                 break;
             }
         }
-
     if(!found) {
         printf("Job %d not found.\n", id);
     }
