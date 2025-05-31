@@ -18,15 +18,22 @@
 #define MAX_CMD_BUFFER 255
 
 pid_t shell_id;
+int exit_status = 0;
 
 int main(int argc, char *argv[]) {
 
     shell_id = getpid();
+    
     setpgid(0, 0);
     tcsetpgrp(STDIN_FILENO, shell_id);
+
     signal(SIGTTOU, SIG_IGN);
     signal(SIGTTIN, SIG_IGN);
+    signal(SIGINT, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
+
     signalHandler();
+
     printf("Shell PID: %d, PGID: %d\n", shell_id, getpgrp());
 
     FILE *fp = NULL;

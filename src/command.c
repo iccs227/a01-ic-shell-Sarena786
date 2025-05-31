@@ -16,6 +16,7 @@
 
 volatile sig_atomic_t pid_track = 0;
 pid_t group_id;
+extern int exit_status;
 
 int cmdHandler(char **args) {
 
@@ -84,6 +85,11 @@ void RunExternalCmd(char **args, const char *cmdline) {
             tcsetpgrp(STDIN_FILENO, getpid()); // terminal controls this process group
         }
 
+        signal(SIGINT, SIG_DFL);
+        signal(SIGTSTP, SIG_DFL);
+        signal(SIGTTOU, SIG_DFL);
+        signal(SIGTTIN, SIG_DFL);
+
         redirect(args);
         execvp (args[0], args); // only return when there is an error
 
@@ -94,7 +100,6 @@ void RunExternalCmd(char **args, const char *cmdline) {
     if(pid) { // parent process
 
         setpgid(pid, pid); // set child's process group
-        
         printf("Child PID: %d, PGID: %d\n", pid, getpgid(pid));
 
         if(!is_bg) {
@@ -110,13 +115,7 @@ void RunExternalCmd(char **args, const char *cmdline) {
 
             pid_track = -1;
 
-            if (WIFSTOPPED(status)  ) {
-                printf("The process %d is suspended.\n", pid);
-            } else {
-                printf("The process %d is done.\n", pid);
-                clean_jobs(pid);
-            }
-            
+            exit_handler(status, pid, -1);
         } else {
             is_bg = 0;
             keepJob(pid, cmdline);

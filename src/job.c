@@ -7,11 +7,13 @@
 #include "command.h"
 #include <sys/wait.h>
 #include <errno.h>
+#include "signal.h"
 
 job jobs[MAX_JOBS];
 int current_job = 0;
 int job_id = 1;
 job* fg_job = NULL;
+extern int exit_status;
 
 void keepJob(pid_t pid, const char *command) {
     if (current_job >= MAX_JOBS) {
@@ -72,22 +74,16 @@ void to_fg(int id) {
                 tcsetpgrp(STDIN_FILENO, shell_id);
                 pid_track = -1;
 
-                if(WIFSTOPPED(status)) {
-                    strcpy(jobs[i].status, "Stopped");
-                    printf("\n[%d]  %s\t\t%s\n", jobs[i].job_id, jobs[i].status, jobs[i].command);
-                } else if (WIFEXITED(status) || WIFSIGNALED(status)) {
-                    strcpy(jobs[i].status, "Done");
-                    printf("\n[%d]  %s\t\t%s\n", jobs[i].job_id, jobs[i].status, jobs[i].command);
-                    clean_jobs(pid);
+                exit_handler(status, pid, i);
+
                 }
+                break;
             }
-            break;
+        }
+        if(!found) {
+        printf("Job not found.\n");
         }
     }
-    if(!found) {
-        printf("Job not found.\n");
-    }
-}
 
 void cont_bg(int id) {
     int found = 1;
